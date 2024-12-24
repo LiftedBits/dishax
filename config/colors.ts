@@ -1,0 +1,7 @@
+export const workerLoginBackground = "#FFFFFF"
+export const workerLoginCard = "#05247C"
+export const workerLoginButton = "#2658FF"
+export const workerLoginDialogBox = "#DCF2FC"
+export const workerLoginDialog = "#267AFC"
+export const homeBackground = "#05247C"
+export const formBackground = "#F3F8FF"
