@@ -135,7 +135,9 @@ const LoginScreen = () => {
           >
             <Text style={{ color: "#fff", fontSize: 16 }}>LOGIN</Text>
           </Button>
-          <TouchableRipple onPress={() => {}}>
+            <TouchableRipple
+            onPress={() => router.push("/forgot-password")} // Navigate to Forgot Password screen
+          >
             <Text style={{ color: "#fff", fontSize: 16 }}>
               Forgot Password?
             </Text>
