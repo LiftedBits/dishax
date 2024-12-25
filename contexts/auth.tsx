@@ -4,14 +4,18 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail
 } from "firebase/auth"
 import { auth } from "../lib/firebase"
+
 
 interface AuthContextProps {
   user: User | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  forgotPassword: (email: string) => Promise<void>
+  
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -47,9 +51,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false)
     }
   }
-
+  const forgotPassword = async (email: string) => {
+    if (!email.trim()) {
+      throw new Error("Email address is required.");
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        switch ((error as any).code) {
+          case "auth/user-not-found":
+            throw new Error("The email address is not registered.");
+          case "auth/invalid-email":
+            throw new Error("Please enter a valid email address.");
+          default:
+            throw new Error(error.message);
+        }
+      } else {
+        throw new Error("An unexpected error occurred.");
+      }
+    }
+  };
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, forgotPassword}}>
       {children}
     </AuthContext.Provider>
   )
