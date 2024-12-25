@@ -10,7 +10,7 @@ const AppLayout = () => {
   if (!user) {
     return <Redirect href="/login" />
   }
-  return <Stack />
+  return <Stack screenOptions={{ headerShown: false }} />
 }
 
 export default AppLayout
