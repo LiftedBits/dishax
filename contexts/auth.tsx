@@ -1,16 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 import {
-  User,
+  // User,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth"
-import { auth } from "../lib/firebase"
+// import { auth } from "../lib/firebase"
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 
 interface AuthContextProps {
-  user: User | null
+  user: FirebaseAuthTypes.User | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
+  forgotPassword: (email: string) => Promise<void>
+  sendOtp: (phoneNumber: string) => Promise<void>
+  verifyOtp: (otp: string) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -19,21 +23,69 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [confirmationResult, setConfirmationResult] = useState<any>(null)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-      setLoading(false)
+    const unsubscribe = auth().onAuthStateChanged((authUser) => {
+      setUser(authUser)
+      setLoading(false) // Finished loading once we have the initial auth state
     })
-    return () => unsubscribe()
+
+    // Cleanup the subscription on unmount
+    return unsubscribe
   }, [])
+
+  // const login = async (email: string, password: string) => {
+  //   setLoading(true)
+  //   try {
+  //     await signInWithEmailAndPassword(auth, email, password)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const login = async (email: string, password: string) => {
     setLoading(true)
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      await auth().signInWithEmailAndPassword(email, password)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const forgotPassword = async (email: string) => {
+    setLoading(true)
+    try {
+      await auth().sendPasswordResetEmail(email)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const sendOtp = async (phoneNumber: string) => {
+    console.log(`Sending OTP to ${phoneNumber}`)
+    setLoading(true)
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber)
+      console.log("OTP sent")
+      setConfirmationResult(confirmation)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const verifyOtp = async (otp: string) => {
+    setLoading(true)
+    try {
+      await confirmationResult.confirm(otp)
     } finally {
       setLoading(false)
     }
@@ -42,14 +94,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = async () => {
     setLoading(true)
     try {
-      await signOut(auth)
+      // await signOut(auth)
+      await auth().signOut()
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        sendOtp,
+        verifyOtp,
+        logout,
+        login,
+        forgotPassword,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

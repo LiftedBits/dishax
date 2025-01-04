@@ -57,6 +57,7 @@ const WorkerLoginCard = ({
 const styles = StyleSheet.create({
   bottomDiv: {
     backgroundColor: workerLoginCard,
+    width: "100%",
     padding: 20,
     paddingTop: 40,
     borderTopLeftRadius: 20,
