@@ -1,57 +1,70 @@
 import HomePageCard from "@/components/home-page-card"
 import { useAuth } from "@/contexts/auth"
-import { Text, TouchableOpacity, View } from "react-native"
-import MaterialIcons from "@expo/vector-icons/MaterialIcons"
+import { ScrollView, Text } from "react-native"
+import { router } from "expo-router"
+import { SafeAreaView } from "react-native"
+import Banner from "@/components/banner"
+import { formBackground, workerLoginCard } from "@/config/colors"
 
 const HomePage = () => {
   const { user, logout } = useAuth()
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
-        paddingLeft: 20,
-        paddingRight: 20,
-        backgroundColor: "#550000",
+        backgroundColor: formBackground,
       }}
     >
-      <View
+      <Banner />
+      <ScrollView
         style={{
-          width: "100%",
-          height: 80,
-          position: "relative",
-          justifyContent: "center",
-          alignItems: "center",
+          paddingLeft: 20,
+          paddingRight: 20,
         }}
       >
-        <Text style={{ color: "#fff", fontSize: 36, fontWeight: "600" }}>
-          DishaX
-        </Text>
-        <MaterialIcons
-          name="logout"
-          color="#fff"
-          size={25}
+        <Text
           style={{
-            position: "absolute",
-            right: 20,
+            marginTop: 24,
+            fontWeight: 400,
+            fontSize: 24,
+            color: workerLoginCard,
           }}
-          onPress={logout}
+        >
+          Hello! {user?.displayName}Suresh Kumar
+        </Text>
+        <Text
+          style={{
+            color: workerLoginCard,
+            fontSize: 18,
+            fontWeight: 600,
+            padding: 10,
+            marginTop: 10,
+            marginBottom: 16,
+          }}
+        >
+          Welcome to the home page. Please use the below options to collect
+          data!
+        </Text>
+        <HomePageCard
+          title="Create a new client profile"
+          onPress={() => {
+            router.push("/(app)/permssions")
+          }}
         />
-      </View>
-      <Text
-        style={{
-          color: "#fff",
-          fontSize: 18,
-          padding: 10,
-          marginTop: 10,
-          marginBottom: 20,
-        }}
-      >
-        Welcome to the home page. Please use the below options to collect data!
-      </Text>
-      <HomePageCard title="Create a new client profile" />
-      <HomePageCard title="Use the AI symptom checker" />
-      <HomePageCard title="Update existing client profile" />
-    </View>
+        <HomePageCard
+          title="Use the AI symptom checker"
+          onPress={() => {
+            // router.push("/register")
+          }}
+        />
+        <HomePageCard
+          title="Update existing client profile"
+          onPress={() => {
+            // router.push("/register")
+          }}
+        />
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 

@@ -1,24 +1,21 @@
-import { useEffect, useRef, useState } from "react"
-import { View, Text, Image, StyleSheet, Keyboard } from "react-native"
-import WokerLoginCard from "@/components/bottom-card"
+import WorkerLoginCard from "@/components/bottom-card"
 import { formBackground, workerLoginButton } from "@/config/colors"
+import { useAuth } from "@/contexts/auth"
+import { router } from "expo-router"
+import { useEffect, useState } from "react"
+import { Keyboard } from "react-native"
+import { Image, StyleSheet, Text, View } from "react-native"
 import {
   ActivityIndicator,
   Button,
   TextInput,
   TouchableRipple,
 } from "react-native-paper"
-import { useAuth } from "@/contexts/auth"
-import { router } from "expo-router"
 
-const LoginScreen = () => {
-  const { login, loading, state, message, forgotPassword } = useAuth()
-  const [keyboardVisible, setKeyboardVisible] = useState(false)
+const ForgotPassword = () => {
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [passwordVisible, setPasswordVisible] = useState(false)
-
-
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
+  const { loading, forgotPassword, message } = useAuth()
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -39,15 +36,6 @@ const LoginScreen = () => {
       keyboardDidHideListener.remove()
     }
   }, [])
-
-  const handleLogin = async () => {
-    Keyboard.dismiss()
-    const success = await login(email, password)
-    if (success) {
-      router.push("/(app)")
-    }
-  }
-
   return (
     <View style={styles.container}>
       <View style={styles.banner}>
@@ -56,7 +44,7 @@ const LoginScreen = () => {
           style={styles.logo}
         />
       </View>
-      <WokerLoginCard message={message} isAvatarVisible={!keyboardVisible}>
+      <WorkerLoginCard message={message} isAvatarVisible={!keyboardVisible}>
         <View
           style={{
             display: "flex",
@@ -102,45 +90,21 @@ const LoginScreen = () => {
                 borderTopRightRadius: 8,
               }}
             />
-            <Text style={{ color: "#fff", fontSize: 16, marginTop: 12 }}>
-              Password
-            </Text>
-            <TextInput
-              secureTextEntry={!passwordVisible}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="* * * * * *"
-              mode="flat"
-              style={{
-                width: "100%",
-                height: 50,
-                marginTop: 5,
-                borderRadius: 8,
-                borderTopLeftRadius: 8,
-                borderTopRightRadius: 8,
-              }}
-              right={
-                <TextInput.Icon
-                  icon="eye"
-                  onPress={() => {
-                    setPasswordVisible((visibility) => !visibility)
-                  }}
-                />
-              }
-            />
           </View>
           <Button
             mode="contained"
             disabled={loading}
             style={{
               width: "100%",
-              marginTop: 24,
+              marginTop: 12,
               backgroundColor: loading ? formBackground : workerLoginButton,
               height: 50,
               borderRadius: 8,
               justifyContent: "center",
             }}
-            onPress={handleLogin}
+            onPress={() => {
+              forgotPassword(email)
+            }}
           >
             {loading ? (
               <ActivityIndicator color={workerLoginButton} size="small" />
@@ -149,17 +113,15 @@ const LoginScreen = () => {
             )}
           </Button>
           <TouchableRipple
-            style={styles.forgotPassword}
+            style={{ marginTop: 10 }}
             onPress={() => {
-              router.push("/forgot_password")
+              router.replace("/login")
             }}
           >
-            <Text style={{ color: "#fff", fontSize: 16 }}>
-              Forgot Password?
-            </Text>
+            <Text style={{ color: "#fff", fontSize: 16 }}>Go back</Text>
           </TouchableRipple>
         </View>
-      </WokerLoginCard>
+      </WorkerLoginCard>
     </View>
   )
 }
@@ -213,4 +175,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default LoginScreen
+export default ForgotPassword

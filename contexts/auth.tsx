@@ -1,21 +1,23 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
-import {
-  // User,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth"
+// import {
+//   // User,
+//   onAuthStateChanged,
+//   signInWithEmailAndPassword,
+//   signOut,
+// } from "firebase/auth"
 // import { auth } from "../lib/firebase"
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 
 interface AuthContextProps {
   user: FirebaseAuthTypes.User | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<boolean>
   forgotPassword: (email: string) => Promise<void>
   sendOtp: (phoneNumber: string) => Promise<void>
   verifyOtp: (otp: string) => Promise<void>
   logout: () => Promise<void>
+  state: "none" | "error"
+  message: string
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -26,6 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmationResult, setConfirmationResult] = useState<any>(null)
+  const [message, setMessage] = useState<string>("Welcome to DishaX. Please login to continue")
+  const [state, setState] = useState<"none" | "error">("none")
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((authUser) => {
@@ -50,8 +54,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(true)
     try {
       await auth().signInWithEmailAndPassword(email, password)
-    } catch (error) {
+      return true
+    } catch (error: any) {
       console.error(error)
+      console.log(error.code)
+      setState("error")
+      if (error.code === "auth/invalid-credential") {
+        setMessage("Wrong email/password! Please try again.")
+      } else if (error.code === "auth/invalid-email") {
+        setMessage("Please check the email!")
+      } else {
+        setMessage("Failed to log in! Please try again later.")
+      }
+      // console.error(error)
+      return false
     } finally {
       setLoading(false)
     }
@@ -61,8 +77,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(true)
     try {
       await auth().sendPasswordResetEmail(email)
+      setMessage("Password reset link has been sent to you email")
     } catch (error) {
       console.error(error)
+      setMessage("Some error occurred. Please try again later!")
     } finally {
       setLoading(false)
     }
@@ -111,6 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         login,
         forgotPassword,
+        state,
+        message,
       }}
     >
       {children}
