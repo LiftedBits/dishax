@@ -1,12 +1,15 @@
+import FormList from "@/components/form-list"
+import { workerLoginCard } from "@/config/colors"
 import {
   useGlobalSearchParams,
   useLocalSearchParams,
   useRouter,
 } from "expo-router"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { Text, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function FormsPage() {
-  const { phone } = useLocalSearchParams() // Retrieve phone number
+  const { phone } = useLocalSearchParams()
   const glob = useGlobalSearchParams()
   const loc = useLocalSearchParams()
   console.log("loc", loc)
@@ -18,47 +21,32 @@ export default function FormsPage() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Phone Number: {phone}</Text>
-      <TouchableOpacity
-        onPress={() => {
-          navigateToForm("form1")
-          console.log("going to form1")
-        }}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Go to Form 1</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        // onPress={() => navigateToForm("form2")}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Go to Form 2</Text>
-      </TouchableOpacity>
-      <Text>{phone}</Text>
-    </View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: workerLoginCard,
+        paddingHorizontal: 8,
+        paddingTop: 24,
+      }}
+    >
+      <View style={{ paddingHorizontal: 16 }}>
+        <Text style={{ color: "#fff", fontSize: 24 }}>Hello! Suresh Kumar</Text>
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 16,
+            marginTop: 16,
+            fontWeight: "600",
+          }}
+        >
+          Welcome to your client name page, please use the below forms to
+          collect data!
+        </Text>
+      </View>
+
+      <View style={{ flex: 1, marginTop: 48, marginBottom: 32 }}>
+        <FormList />
+      </View>
+    </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  text: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-})

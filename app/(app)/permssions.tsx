@@ -1,14 +1,14 @@
-import React, { useCallback, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { View, Text, ScrollView } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
-import SignatureBox from "./signature"
+import SignatureBox from "../../components/signature"
 import Banner from "@/components/banner"
 import AntDesign from "@expo/vector-icons/AntDesign"
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { workerLoginButton, workerLoginCard } from "@/config/colors"
-import { Checkbox } from "react-native-paper"
+import { Checkbox, TextInput } from "react-native-paper"
 import { MenuButton, PrimaryButton } from "@/components/button"
 import PhoneInput from "react-native-phone-number-input"
 import { Keyboard } from "react-native"
@@ -16,6 +16,8 @@ import { OtpInput } from "react-native-otp-entry"
 import { useRouter } from "expo-router"
 
 const Permissions = ({}) => {
+  const COUNTDOWN = 30
+
   const router = useRouter()
   type Operation = "phone_verification" | "consent"
   const [status, setStatus] = useState<"checked" | "unchecked">("checked")
@@ -31,6 +33,7 @@ const Permissions = ({}) => {
   const [otpSent, setOtpSent] = useState(false)
   const [retries, setRetries] = useState(0)
   const [resendCountdown, setResendCountdown] = useState(0)
+  const [isRunning, setIsRunning] = useState(false)
   const handlePhoneChange = (number: string) => {
     setPhoneNumber(number)
   }
@@ -48,6 +51,26 @@ const Permissions = ({}) => {
     refs[operation].current?.close()
     Keyboard.dismiss()
   }, [])
+
+  const startCountDown = () => {
+    setIsRunning(true)
+    setResendCountdown(COUNTDOWN)
+  }
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined
+
+    if (isRunning && resendCountdown > 0) {
+      timer = setInterval(() => {
+        setResendCountdown((prev) => prev - 1)
+      }, 1000)
+    } else if (resendCountdown === 0) {
+      setIsRunning(false)
+    }
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [isRunning, resendCountdown])
 
   return (
     <GestureHandlerRootView
@@ -99,13 +122,13 @@ const Permissions = ({}) => {
           onPress={() => {
             router.push({
               pathname: "/forms",
-              params: { phone: formattedPhoneNumber },
+              params: { phone: phoneNumber },
             })
           }}
-        //   disabled={
-        //     phoneVerficationProgress !== "verified" ||
-        //     consentProgress !== "signed"
-        //   }
+          //   disabled={
+          //     phoneVerficationProgress !== "verified" ||
+          //     consentProgress !== "signed"
+          //   }
         />
       </View>
       <BottomSheet
@@ -261,7 +284,7 @@ const Permissions = ({}) => {
       <BottomSheet
         ref={phoneVerficationRef}
         index={-1}
-        snapPoints={["40%"]}
+        snapPoints={["50%"]}
         enablePanDownToClose={false}
         enableContentPanningGesture={false}
         handleComponent={() => null}
@@ -276,7 +299,7 @@ const Permissions = ({}) => {
             flex: 1,
             padding: 40,
             alignItems: "center",
-            justifyContent: "space-evenly",
+            justifyContent: "space-around",
             backgroundColor: workerLoginCard,
           }}
         >
@@ -315,41 +338,62 @@ const Permissions = ({}) => {
           />
           {phoneVerficationProgress === "none" ? (
             <>
-              <PhoneInput
-                ref={phoneInputRef}
-                defaultCode="IN"
-                layout="first"
+              <View style={{ width: "100%" }}>
+                <Text style={{ color: "#fff", fontSize: 16 }}>Phone no.</Text>
+              </View>
+              <TextInput
                 value={phoneNumber}
-                onChangeText={handlePhoneChange}
-                onChangeFormattedText={setFormattedPhoneNumber}
-                withDarkTheme
-                withShadow
-                autoFocus
-                textInputStyle={{
-                  height: 40,
-                  borderRadius: 8,
-                  paddingHorizontal: 8,
-                }}
-                containerStyle={{
+                onChangeText={setPhoneNumber}
+                placeholder="+91 _ _ _ _ _ _ _ _ _ _"
+                mode="flat"
+                style={{
                   width: "100%",
                   height: 60,
-                  marginBottom: 10,
+                  marginTop: 5,
                   borderRadius: 8,
+                  borderTopLeftRadius: 8,
+                  borderTopRightRadius: 8,
+                  paddingHorizontal: 24,
+                  fontSize: 18,
                 }}
-                textContainerStyle={{
-                  borderRadius: 8,
-                }}
+                placeholderTextColor="#0005"
+                right={<TextInput.Icon icon="phone" disabled />}
               />
               <PrimaryButton
                 buttonText="SEND OTP"
                 onPress={() => {
                   setPhoneVerificationProgress("otp-sent")
+                  startCountDown()
                 }}
                 sx={{ width: "100%" }}
               />
             </>
           ) : (
             <>
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "#fff",
+                  }}
+                >
+                  OTP sent to {phoneNumber}{" "}
+                </Text>
+                <MaterialIcons
+                  name="edit"
+                  size={16}
+                  color="#fff"
+                  onPress={() => {
+                    setPhoneVerificationProgress("none")
+                  }}
+                />
+              </View>
               <OtpInput
                 numberOfDigits={6}
                 onTextChange={(text) => console.log(text)}
@@ -376,32 +420,20 @@ const Permissions = ({}) => {
                   width: "100%",
                   marginTop: 16,
                   flexDirection: "row",
-                  justifyContent: "space-between",
                 }}
               >
                 <Text
                   style={{
                     fontSize: 16,
-                    color: "#fff",
+                    color: isRunning ? "#fff5" : "#fff",
                   }}
-                  disabled={resendCountdown > 0}
+                  disabled={isRunning}
                   onPress={() => {
                     console.log("Resending OTP")
                   }}
                 >
                   Resend OTP
-                  {resendCountdown > 0 ? `in ${resendCountdown} s` : ""}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: "#fff",
-                  }}
-                  onPress={() => {
-                    setPhoneVerificationProgress("none")
-                  }}
-                >
-                  Go back
+                  {resendCountdown > 0 ? ` in ${resendCountdown} s` : ""}
                 </Text>
               </View>
               <PrimaryButton
