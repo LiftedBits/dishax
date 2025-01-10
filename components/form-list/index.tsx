@@ -73,7 +73,7 @@ const FormList = () => {
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                justifyContent: "space-evenly",
                 alignItems: "center",
                 width: "100%",
               }}

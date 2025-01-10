@@ -14,29 +14,30 @@ import PhoneInput from "react-native-phone-number-input"
 import { Keyboard } from "react-native"
 import { OtpInput } from "react-native-otp-entry"
 import { useRouter } from "expo-router"
+import { requestOtp, validateOtp } from "@/lib/apis"
+import { validatePhoneNumber } from "@/lib/utils"
+import { Alert } from "react-native"
+import { useUserSession } from "@/contexts/client-session"
 
 const Permissions = ({}) => {
   const COUNTDOWN = 30
 
   const router = useRouter()
+  const { startSession } = useUserSession()
   type Operation = "phone_verification" | "consent"
   const [status, setStatus] = useState<"checked" | "unchecked">("checked")
   const [consentProgress, setConsentProgress] = useState<
     "none" | "checked" | "signed"
   >("none")
-  const phoneInputRef = useRef<PhoneInput>(null)
   const [phoneNumber, setPhoneNumber] = useState<string>("")
-  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState<string>("")
   const [phoneVerficationProgress, setPhoneVerificationProgress] = useState<
     "none" | "otp-sent" | "verified"
   >("none")
-  const [otpSent, setOtpSent] = useState(false)
-  const [retries, setRetries] = useState(0)
+  const [otp, setOtp] = useState("")
+  const [otpId, setOtpId] = useState("")
   const [resendCountdown, setResendCountdown] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
-  const handlePhoneChange = (number: string) => {
-    setPhoneNumber(number)
-  }
+  const [isLoading, setIsLoading] = useState(false)
 
   const phoneVerficationRef = useRef<BottomSheet>(null)
   const consentSheetRef = useRef<BottomSheet>(null)
@@ -55,6 +56,34 @@ const Permissions = ({}) => {
   const startCountDown = () => {
     setIsRunning(true)
     setResendCountdown(COUNTDOWN)
+  }
+
+  const sendOtp = async () => {
+    if (!validatePhoneNumber(phoneNumber)) {
+      Alert.alert("Please check the phone number")
+      return
+    }
+    setIsLoading(true)
+    const _otpId = await requestOtp(phoneNumber)
+    setOtpId(_otpId)
+    setPhoneVerificationProgress("otp-sent")
+    setIsLoading(false)
+    startCountDown()
+  }
+
+  const verifyOtp = async () => {
+    setIsLoading(true)
+    const response = await validateOtp(otpId, otp)
+    setIsLoading(false)
+    console.log("validation: ", response?.success)
+    console.log("token: ", response?.token)
+    if (response?.success) {
+      startSession(response.token)
+      setPhoneVerificationProgress("verified")
+      handleClose("phone_verification")
+    } else {
+      console.log("validation failed")
+    }
   }
 
   useEffect(() => {
@@ -119,16 +148,17 @@ const Permissions = ({}) => {
         </View>
         <PrimaryButton
           buttonText="Proceed"
-          onPress={() => {
-            router.push({
+          onPress={async () => {
+            router.replace({
               pathname: "/forms",
               params: { phone: phoneNumber },
             })
           }}
-          //   disabled={
-          //     phoneVerficationProgress !== "verified" ||
-          //     consentProgress !== "signed"
-          //   }
+          disabled={
+            phoneVerficationProgress !== "verified" ||
+            consentProgress !== "signed"
+          }
+          sx={{ width: 200 }}
         />
       </View>
       <BottomSheet
@@ -262,7 +292,7 @@ const Permissions = ({}) => {
                 </Text>
               </View>
               <PrimaryButton
-                loading={false}
+                loading={isLoading}
                 disabled={status !== "checked"}
                 onPress={() => {
                   setConsentProgress("checked")
@@ -361,10 +391,8 @@ const Permissions = ({}) => {
               />
               <PrimaryButton
                 buttonText="SEND OTP"
-                onPress={() => {
-                  setPhoneVerificationProgress("otp-sent")
-                  startCountDown()
-                }}
+                loading={isLoading}
+                onPress={sendOtp}
                 sx={{ width: "100%" }}
               />
             </>
@@ -396,7 +424,7 @@ const Permissions = ({}) => {
               </View>
               <OtpInput
                 numberOfDigits={6}
-                onTextChange={(text) => console.log(text)}
+                onTextChange={(otp) => setOtp(otp)}
                 theme={{
                   pinCodeTextStyle: {
                     color: "#fff",
@@ -437,10 +465,9 @@ const Permissions = ({}) => {
                 </Text>
               </View>
               <PrimaryButton
+                loading={isLoading}
                 buttonText="VERIFY"
-                onPress={() => {
-                  setPhoneVerificationProgress("verified")
-                }}
+                onPress={verifyOtp}
                 sx={{ width: "100%" }}
               />
             </>

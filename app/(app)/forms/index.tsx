@@ -1,5 +1,7 @@
 import FormList from "@/components/form-list"
 import { workerLoginCard } from "@/config/colors"
+import { useUserSession } from "@/contexts/client-session"
+import { getTimeStr } from "@/lib/utils"
 import {
   useGlobalSearchParams,
   useLocalSearchParams,
@@ -12,13 +14,13 @@ export default function FormsPage() {
   const { phone } = useLocalSearchParams()
   const glob = useGlobalSearchParams()
   const loc = useLocalSearchParams()
-  console.log("loc", loc)
-  console.log("glob", glob)
   const router = useRouter()
 
   const navigateToForm = (formId: string) => {
     router.push(`/forms/${formId}`)
   }
+
+  const { remainingTime, startSession } = useUserSession()
 
   return (
     <SafeAreaView
@@ -30,13 +32,29 @@ export default function FormsPage() {
       }}
     >
       <View style={{ paddingHorizontal: 16 }}>
-        <Text style={{ color: "#fff", fontSize: 24 }}>Hello! Suresh Kumar</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "#fff", fontSize: 24 }}>
+            Hello! Suresh Kumar
+          </Text>
+          <Text style={{ color: "#fff" }}>
+            Session: {getTimeStr(remainingTime)}
+          </Text>
+        </View>
         <Text
           style={{
             color: "#fff",
             fontSize: 16,
             marginTop: 16,
             fontWeight: "600",
+          }}
+          onPress={() => {
+            startSession("abc")
           }}
         >
           Welcome to your client name page, please use the below forms to

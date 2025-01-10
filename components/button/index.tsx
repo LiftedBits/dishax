@@ -2,7 +2,10 @@ import {
   formBackground,
   menuButtonBackground,
   menuButtonText,
+  workerLoginBackground,
   workerLoginButton,
+  workerLoginDialog,
+  workerLoginDialogBox,
 } from "@/config/colors"
 import { DimensionValue, StyleProp, ViewStyle } from "react-native"
 import { ActivityIndicator, Button, Text } from "react-native-paper"
@@ -32,7 +35,7 @@ const PrimaryButton = ({
         {
           marginTop: 24,
           backgroundColor:
-            loading || disabled ? formBackground : workerLoginButton,
+            loading || disabled ? workerLoginDialogBox : workerLoginButton,
           height: 50,
           borderRadius: 8,
           justifyContent: "center",
