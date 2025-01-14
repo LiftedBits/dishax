@@ -19,7 +19,7 @@ export const NumberInput = ({ value, setValue, label }: NumberInputProps) => {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 16,
+        paddingHorizontal: 8,
       }}
     >
       <Text style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>
@@ -37,6 +37,7 @@ export const NumberInput = ({ value, setValue, label }: NumberInputProps) => {
           height: 36,
           borderRadius: 8,
           padding: 8,
+          textAlign: "center",
         }}
       />
     </View>

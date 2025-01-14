@@ -1,24 +1,106 @@
+import { PrimaryButton } from "@/components/button"
 import { CheckboxInput, NumberInput, RadioButtonInput } from "@/components/form"
 import { formBackground, formHeading } from "@/config/colors"
 import { forms } from "@/config/forms"
-import { useLocalSearchParams } from "expo-router"
-import { useState } from "react"
-import { View, Text, ScrollView } from "react-native"
+import { FormId } from "@/config/types"
+import { useFormData } from "@/contexts/form-data"
+import {
+  areAllValuesPresent,
+  areObjectsEqual,
+  initializeData,
+  isInitialData,
+} from "@/lib/utils"
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router"
+import { useCallback, useEffect, useState } from "react"
+import { BackHandler } from "react-native"
+import { View, Text, ScrollView, Alert } from "react-native"
 
 export default function FormDetailsPage() {
-  const formId = useLocalSearchParams()["formId"] as string
+  const formId = useLocalSearchParams()["formId"] as FormId
   const form = forms[formId]
-  const [data, setData] = useState(
-    Object.fromEntries(form.fields.map((field) => [field.name, ""]))
+  const [data, setData] = useState<Record<string, any>>(
+    initializeData(form.fields)
   )
   const handleChange = (name: string, value: any) => {
     setData((prevData) => ({ ...prevData, [name]: value }))
   }
+  const { formData, addFormData, resetFormData } = useFormData()
+
+  const handleClear = () => {
+    Alert.alert(
+      "Confirm reset",
+      "This will reset the current form. Are you sure",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: () => {
+            resetFormData(formId)
+            setData(initializeData(form.fields))
+          },
+        },
+      ]
+    )
+  }
+
+  const handleSave = () => {
+    const keys = form.fields.map((field) => field.name)
+    if (!areAllValuesPresent(data, keys)) {
+      return
+    }
+    // @ts-ignore
+    addFormData({ [formId]: data })
+    router.back()
+  }
+
+  useEffect(() => {
+    if (
+      Object.keys(formData).includes(formId) &&
+      Object.keys(formData[formId]).length
+    ) {
+      // @ts-ignore
+      setData(formData[formId])
+    }
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (Object.keys(formData).includes(formId)) {
+          if (
+            // @ts-ignore
+            areObjectsEqual(data, formData[formId])
+          ) {
+            router.back()
+            return true
+          }
+        } else if (isInitialData(data, form.fields)) {
+          router.back()
+          return true
+        }
+        Alert.alert(
+          "Confirm Back",
+          "Unsaved changes. You will lose data if you go back. Are you sure",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Yes", onPress: () => router.back() },
+          ]
+        )
+        return true
+      }
+      BackHandler.addEventListener("hardwareBackPress", onBackPress)
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress)
+    }, [data])
+  )
+
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: formBackground,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
       }}
     >
       <Text
@@ -33,7 +115,7 @@ export default function FormDetailsPage() {
         {form.name}{" "}
       </Text>
       <ScrollView
-        style={{ paddingHorizontal: 16 }}
+        style={{ paddingHorizontal: 8 }}
         contentContainerStyle={{ rowGap: 16, paddingVertical: 16 }}
       >
         {form.fields.map((field) => {
@@ -41,11 +123,11 @@ export default function FormDetailsPage() {
             <View style={{}} key={field.name}>
               {field.type === "number" ? (
                 <NumberInput
-                  value={String(data[field.name])}
+                  value={data[field.name]}
                   setValue={(value) => {
                     handleChange(field.name, value)
                   }}
-                  label={field.label}
+                  label={`${field.label}${field.required ? " *" : ""}`}
                 />
               ) : field.type === "checkbox" ? (
                 <CheckboxInput
@@ -53,11 +135,11 @@ export default function FormDetailsPage() {
                   toggleStatus={() => {
                     handleChange(field.name, !data[field.name])
                   }}
-                  text={field.label}
+                  text={`${field.required ? "* " : ""}${field.label}`}
                 />
               ) : (
                 <RadioButtonInput
-                  label={field.label}
+                  label={`${field.label}${field.required ? " *" : ""}`}
                   data={field.options}
                   setValue={(value) => {
                     handleChange(field.name, value)
@@ -68,6 +150,28 @@ export default function FormDetailsPage() {
           )
         })}
       </ScrollView>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <PrimaryButton
+          buttonText="CLEAR"
+          onPress={() => {
+            handleClear()
+          }}
+          sx={{ flex: 0.4 }}
+        />
+        <PrimaryButton
+          buttonText="SAVE"
+          onPress={() => {
+            handleSave()
+          }}
+          sx={{ flex: 0.4 }}
+        />
+      </View>
     </View>
   )
 }

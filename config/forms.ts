@@ -26,9 +26,9 @@ type CheckBoxField = {
   required: boolean
 }
 
-type Field = NumberField | SelectField | CheckBoxField
+export type Field = NumberField | SelectField | CheckBoxField
 
-type Form = {
+export type Form = {
   name: string
   fields: Field[]
 }
@@ -75,7 +75,7 @@ export const forms: Record<string, Form> = {
         ],
       },
       {
-        name: "clinical_info.smoking",
+        name: "smoking",
         type: "select",
         label: "Smoking Status",
         required: true,
@@ -88,7 +88,7 @@ export const forms: Record<string, Form> = {
         ],
       },
       {
-        name: "clinical_info.diabetes",
+        name: "diabetes",
         type: "select",
         label: "Diabetes Status",
         required: true,
@@ -99,73 +99,73 @@ export const forms: Record<string, Form> = {
         ],
       },
       {
-        name: "clinical_info.relative_heart_issue",
+        name: "relative_heart_issue",
         type: "checkbox",
         label: "Angina or heart attack in a 1st degree relative < 60?",
         required: true,
       },
       {
-        name: "clinical_info.chronic_kidney_disease",
+        name: "chronic_kidney_disease",
         type: "checkbox",
         label: "Chronic kidney disease (stage 3, 4 or 5)?",
         required: true,
       },
       {
-        name: "clinical_info.atrial_fibrillation",
+        name: "atrial_fibrillation",
         type: "checkbox",
         label: "Atrial fibrillation?",
         required: true,
       },
       {
-        name: "clinical_info.on_bp_treatment",
+        name: "on_bp_treatment",
         type: "checkbox",
         label: "On blood pressure treatment?",
         required: true,
       },
       {
-        name: "clinical_info.migranes",
+        name: "migranes",
         type: "checkbox",
         label: "Do you have migraines?",
         required: true,
       },
       {
-        name: "clinical_info.rheumatoid_arthritis",
+        name: "rheumatoid_arthritis",
         type: "checkbox",
         label: "Rheumatoid Arthritis?",
         required: true,
       },
       {
-        name: "clinical_info.sle",
+        name: "sle",
         type: "checkbox",
         label: "Systemic lupus erythematosus (SLE)?",
         required: true,
       },
       {
-        name: "clinical_info.severe_mental_illness",
+        name: "severe_mental_illness",
         type: "checkbox",
         label: "Severe mental illness?",
         required: true,
       },
       {
-        name: "clinical_info.antipsychotic_medication",
+        name: "antipsychotic_medication",
         type: "checkbox",
         label: "On atypical antipsychotic medication?",
         required: true,
       },
       {
-        name: "clinical_info.steriods",
+        name: "steriods",
         type: "checkbox",
         label: "Are you on regular steroid tablets?",
         required: true,
       },
       {
-        name: "clinical_info.erecticle_disfunction",
+        name: "erecticle_disfunction",
         type: "checkbox",
         label: "A diagnosis of or treatment for erectile disfunction?",
         required: true,
       },
       {
-        name: "clinical_info.bmi.height",
+        name: "bmi.height",
         type: "number",
         label: "Height (cm)",
         required: true,
@@ -175,7 +175,7 @@ export const forms: Record<string, Form> = {
         },
       },
       {
-        name: "clinical_info.bmi.weight",
+        name: "bmi.weight",
         type: "number",
         label: "Weight (kg)",
         required: true,
@@ -185,13 +185,13 @@ export const forms: Record<string, Form> = {
         },
       },
       {
-        name: "optional_clinical_info.cholestrol_by_hdl_ratio",
+        name: "optional_cholestrol_by_hdl_ratio",
         type: "number",
         label: "Cholesterol by HDL Ratio",
         required: false,
       },
       {
-        name: "optional_clinical_info.systolic_bp_mmHg",
+        name: "optional_systolic_bp_mmHg",
         type: "number",
         label: "Systolic BP (mmHg)",
         required: false,

@@ -1,8 +1,10 @@
+import { useAuth } from "@/contexts/auth"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { Image, Text, View } from "react-native"
 import { Avatar } from "react-native-paper"
 
 const Banner = () => {
+  const { logout } = useAuth()
   return (
     <View
       style={{
@@ -44,7 +46,7 @@ const Banner = () => {
           }}
         >
           <FontAwesome name="location-arrow" size={24} color="black" />
-          <Text>Pune</Text>
+          <Text onPress={logout}>Pune</Text>
         </View>
       </View>
     </View>

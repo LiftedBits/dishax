@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons"
-import { View, Text, Dimensions } from "react-native"
+import { View } from "react-native"
 import { MenuButton } from "../button"
 import {
   GestureHandlerRootView,
@@ -7,10 +7,19 @@ import {
 } from "react-native-gesture-handler"
 import AntDesign from "@expo/vector-icons/AntDesign"
 import { useRef } from "react"
-import { forms } from "@/config/forms"
 import { router } from "expo-router"
+import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 
-const FormList = () => {
+interface FormListProps {
+  list: {
+    [key: string]: {
+      name: string
+      complete: boolean
+    }
+  }
+}
+
+const FormList = ({ list }: FormListProps) => {
   const ref = useRef<ScrollView>(null)
   const scrollToTop = () => {
     ref.current?.scrollTo({ y: 0, animated: true })
@@ -19,7 +28,7 @@ const FormList = () => {
   const scrollToBottom = () => {
     ref.current?.scrollToEnd({ animated: true })
   }
-  const formIds = Object.keys(forms)
+  const formIds = Object.keys(list)
   return (
     <View style={{ flexDirection: "row" }}>
       <View
@@ -63,13 +72,21 @@ const FormList = () => {
               key={formId}
             >
               <MenuButton
-                buttonText={forms[formId].name}
+                buttonText={list[formId].name}
                 onPress={() => {
                   router.push(`/(app)/forms/${formId}`)
                 }}
                 width={250}
               />
-              <Ionicons name="checkmark-done-circle" size={32} color="green" />
+              {list[formId].complete ? (
+                <Ionicons
+                  name="checkmark-done-circle"
+                  size={32}
+                  color="green"
+                />
+              ) : (
+                <MaterialIcons name="pending" size={32} color="orange" />
+              )}
             </View>
           ))}
         </ScrollView>

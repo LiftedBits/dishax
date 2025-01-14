@@ -126,9 +126,9 @@ const Permissions = ({}) => {
             width={250}
           />
           {phoneVerficationProgress === "verified" ? (
-            <Ionicons name="checkmark-done-circle" size={24} color="#3acc6c" />
+            <Ionicons name="checkmark-done-circle" size={32} color="#3acc6c" />
           ) : (
-            <MaterialIcons name="pending-actions" size={24} color="black" />
+            <MaterialIcons name="pending" size={32} color="orange" />
           )}
         </View>
         <View style={{ flexDirection: "row", gap: 20, alignItems: "center" }}>
@@ -141,9 +141,9 @@ const Permissions = ({}) => {
             width={250}
           />
           {consentProgress === "signed" ? (
-            <Ionicons name="checkmark-done-circle" size={24} color="#3acc6c" />
+            <Ionicons name="checkmark-done-circle" size={32} color="#3acc6c" />
           ) : (
-            <MaterialIcons name="pending-actions" size={24} color="black" />
+            <MaterialIcons name="pending" size={32} color="orange" />
           )}
         </View>
         <PrimaryButton
@@ -154,10 +154,10 @@ const Permissions = ({}) => {
               params: { phone: phoneNumber },
             })
           }}
-        //   disabled={
-        //     phoneVerficationProgress !== "verified" ||
-        //     consentProgress !== "signed"
-        //   }
+          //   disabled={
+          //     phoneVerficationProgress !== "verified" ||
+          //     consentProgress !== "signed"
+          //   }
           sx={{ width: 200 }}
         />
       </View>

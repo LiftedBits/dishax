@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { View, Text, Image, StyleSheet, Keyboard } from "react-native"
 import WokerLoginCard from "@/components/bottom-card"
 import { formBackground, workerLoginButton } from "@/config/colors"
@@ -17,7 +17,6 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [passwordVisible, setPasswordVisible] = useState(false)
-
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
