@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/auth"
 import { Redirect, Stack } from "expo-router"
-import { Text } from "react-native"
+import { SafeAreaView, Text } from "react-native"
 
 const AppLayout = () => {
   const { user, loading } = useAuth()
@@ -10,7 +10,11 @@ const AppLayout = () => {
   if (!user) {
     return <Redirect href="/login" />
   }
-  return <Stack screenOptions={{ headerShown: false }} />
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SafeAreaView>
+  )
 }
 
 export default AppLayout

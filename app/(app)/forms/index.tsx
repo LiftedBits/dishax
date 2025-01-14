@@ -2,23 +2,12 @@ import FormList from "@/components/form-list"
 import { workerLoginCard } from "@/config/colors"
 import { useUserSession } from "@/contexts/client-session"
 import { getTimeStr } from "@/lib/utils"
-import {
-  useGlobalSearchParams,
-  useLocalSearchParams,
-  useRouter,
-} from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function FormsPage() {
   const { phone } = useLocalSearchParams()
-  const glob = useGlobalSearchParams()
-  const loc = useLocalSearchParams()
-  const router = useRouter()
-
-  const navigateToForm = (formId: string) => {
-    router.push(`/forms/${formId}`)
-  }
 
   const { remainingTime, startSession } = useUserSession()
 
@@ -57,7 +46,7 @@ export default function FormsPage() {
             startSession("abc")
           }}
         >
-          Welcome to your client name page, please use the below forms to
+          Welcome to your "client name" page, please use the below forms to
           collect data!
         </Text>
       </View>

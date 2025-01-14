@@ -7,6 +7,8 @@ import {
 } from "react-native-gesture-handler"
 import AntDesign from "@expo/vector-icons/AntDesign"
 import { useRef } from "react"
+import { forms } from "@/config/forms"
+import { router } from "expo-router"
 
 const FormList = () => {
   const ref = useRef<ScrollView>(null)
@@ -17,26 +19,7 @@ const FormList = () => {
   const scrollToBottom = () => {
     ref.current?.scrollToEnd({ animated: true })
   }
-  const forms = [
-    "form1",
-    "form2",
-    "form3",
-    "form4",
-    "form5",
-    "form6",
-    "form1",
-    "form2",
-    "form3",
-    "form4",
-    "form5",
-    "form6",
-    "form1",
-    "form2",
-    "form3",
-    "form4",
-    "form5",
-    "form6",
-  ]
+  const formIds = Object.keys(forms)
   return (
     <View style={{ flexDirection: "row" }}>
       <View
@@ -69,7 +52,7 @@ const FormList = () => {
           contentContainerStyle={{ paddingBottom: 16, rowGap: 16 }}
           ref={ref}
         >
-          {forms.map((form, index) => (
+          {formIds.map((formId) => (
             <View
               style={{
                 flexDirection: "row",
@@ -77,9 +60,15 @@ const FormList = () => {
                 alignItems: "center",
                 width: "100%",
               }}
-              key={index}
+              key={formId}
             >
-              <MenuButton buttonText={form} onPress={() => {}} width={250} />
+              <MenuButton
+                buttonText={forms[formId].name}
+                onPress={() => {
+                  router.push(`/(app)/forms/${formId}`)
+                }}
+                width={250}
+              />
               <Ionicons name="checkmark-done-circle" size={32} color="green" />
             </View>
           ))}

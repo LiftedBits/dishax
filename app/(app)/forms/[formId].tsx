@@ -1,28 +1,73 @@
-import { useGlobalSearchParams, useLocalSearchParams } from "expo-router"
-import { View, Text, StyleSheet } from "react-native"
+import { CheckboxInput, NumberInput, RadioButtonInput } from "@/components/form"
+import { formBackground, formHeading } from "@/config/colors"
+import { forms } from "@/config/forms"
+import { useLocalSearchParams } from "expo-router"
+import { useState } from "react"
+import { View, Text, ScrollView } from "react-native"
 
 export default function FormDetailsPage() {
-  // const { phone } = useLocalSearchParams()
-  // console.log(phone)
-  console.log(useLocalSearchParams())
-  console.log(useGlobalSearchParams())
+  const formId = useLocalSearchParams()["formId"] as string
+  const form = forms[formId]
+  const [data, setData] = useState(
+    Object.fromEntries(form.fields.map((field) => [field.name, ""]))
+  )
+  const handleChange = (name: string, value: any) => {
+    setData((prevData) => ({ ...prevData, [name]: value }))
+  }
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Form Details for: </Text>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: formBackground,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 24,
+          fontWeight: "bold",
+          color: formHeading,
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+        }}
+      >
+        {form.name}{" "}
+      </Text>
+      <ScrollView
+        style={{ paddingHorizontal: 16 }}
+        contentContainerStyle={{ rowGap: 16, paddingVertical: 16 }}
+      >
+        {form.fields.map((field) => {
+          return (
+            <View style={{}} key={field.name}>
+              {field.type === "number" ? (
+                <NumberInput
+                  value={String(data[field.name])}
+                  setValue={(value) => {
+                    handleChange(field.name, value)
+                  }}
+                  label={field.label}
+                />
+              ) : field.type === "checkbox" ? (
+                <CheckboxInput
+                  status={data[field.name] ? "checked" : "unchecked"}
+                  toggleStatus={() => {
+                    handleChange(field.name, !data[field.name])
+                  }}
+                  text={field.label}
+                />
+              ) : (
+                <RadioButtonInput
+                  label={field.label}
+                  data={field.options}
+                  setValue={(value) => {
+                    handleChange(field.name, value)
+                  }}
+                />
+              )}
+            </View>
+          )
+        })}
+      </ScrollView>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
-})
