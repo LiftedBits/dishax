@@ -2,9 +2,10 @@ import { PrimaryButton } from "@/components/button"
 import FormList from "@/components/form-list"
 import { workerLoginCard } from "@/config/colors"
 import { forms } from "@/config/forms"
+import { FormId } from "@/config/types"
 import { useUserSession } from "@/contexts/client-session"
 import { useFormData } from "@/contexts/form-data"
-import { getTimeStr } from "@/lib/utils"
+import { getTimeStr, validateFormData } from "@/lib/utils"
 import { useFocusEffect } from "@react-navigation/native"
 import { router, useLocalSearchParams } from "expo-router"
 import { useCallback, useEffect, useState } from "react"
@@ -18,11 +19,14 @@ export default function FormsPage() {
 
   const [areFormsComplete, setAreFormsComplete] = useState(false)
 
+  const formIds: FormId[] = Object.keys(forms) as FormId[]
   const formList = Object.fromEntries(
-    Object.keys(forms).map((formId) => [
+    formIds.map((formId) => [
       formId,
       {
-        complete: Object.keys(formData).includes(formId),
+        complete:
+          Object.keys(formData).includes(formId) &&
+          validateFormData(forms[formId], formData[formId]),
         name: forms[formId].name,
       },
     ])

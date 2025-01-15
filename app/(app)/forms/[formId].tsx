@@ -3,7 +3,7 @@ import { CheckboxInput, NumberInput, RadioButtonInput } from "@/components/form"
 import { formBackground, formHeading } from "@/config/colors"
 import { forms } from "@/config/forms"
 import { FormId } from "@/config/types"
-import { useFormData } from "@/contexts/form-data"
+import { RiskFormData, useFormData } from "@/contexts/form-data"
 import {
   areAllValuesPresent,
   areObjectsEqual,
@@ -26,10 +26,12 @@ export default function FormDetailsPage() {
   }
   const { formData, addFormData, resetFormData } = useFormData()
 
+  console.log(Object.keys(formData))
+
   const handleClear = () => {
     Alert.alert(
       "Confirm reset",
-      "This will reset the current form. Are you sure",
+      "This will reset the current form. Are you sure?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -48,8 +50,7 @@ export default function FormDetailsPage() {
     if (!areAllValuesPresent(data, keys)) {
       return
     }
-    // @ts-ignore
-    addFormData({ [formId]: data })
+    addFormData({ [formId]: data } as RiskFormData)
     router.back()
   }
 
@@ -58,7 +59,6 @@ export default function FormDetailsPage() {
       Object.keys(formData).includes(formId) &&
       Object.keys(formData[formId]).length
     ) {
-      // @ts-ignore
       setData(formData[formId])
     }
   }, [])
@@ -67,10 +67,7 @@ export default function FormDetailsPage() {
     useCallback(() => {
       const onBackPress = () => {
         if (Object.keys(formData).includes(formId)) {
-          if (
-            // @ts-ignore
-            areObjectsEqual(data, formData[formId])
-          ) {
+          if (areObjectsEqual(data, formData[formId])) {
             router.back()
             return true
           }
@@ -80,7 +77,7 @@ export default function FormDetailsPage() {
         }
         Alert.alert(
           "Confirm Back",
-          "Unsaved changes. You will lose data if you go back. Are you sure",
+          "Unsaved changes. You will lose data if you go back. Are you sure?",
           [
             { text: "Cancel", style: "cancel" },
             { text: "Yes", onPress: () => router.back() },

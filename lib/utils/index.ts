@@ -1,4 +1,4 @@
-import { Field } from "@/config/forms"
+import { Field, Form } from "@/config/forms"
 
 export const getTimeStr = (seconds: number) => {
   const minutes = Math.floor(seconds / 60)
@@ -80,4 +80,26 @@ export const areObjectsEqual = (
   if (!areEqual) return false
   keys1.forEach((key) => (areEqual = areEqual && obj1[key] === obj2[key]))
   return areEqual
+}
+
+const isNumberWithinLimits = (num: number, min: number, max: number) => {
+  return num >= min && num <= max
+}
+
+export const validateFormData = (form: Form, data: Record<string, any>) => {
+  let isValid = true
+  form.fields.forEach((field) => {
+    if (field.required && isEmptyString(data[field.name]))
+      isValid = isValid && false
+    if (field.required && field.type === "number") {
+      isValid =
+        isValid &&
+        isNumberWithinLimits(
+          parseFloat(data[field.name]),
+          field.validation.min,
+          field.validation.max
+        )
+    }
+  })
+  return isValid
 }

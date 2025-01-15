@@ -1,4 +1,6 @@
+import { forms } from "@/config/forms"
 import { FormId } from "@/config/types"
+import { initializeData } from "@/lib/utils"
 import { createContext, useContext, useState } from "react"
 
 interface FormDataContextProps {
@@ -11,7 +13,7 @@ const FormDataContext = createContext<FormDataContextProps | undefined>(
   undefined
 )
 
-type RiskFormData = {
+export type RiskFormData = {
   [formId in FormId]: Record<string, any>
 }
 
@@ -20,10 +22,12 @@ export const FormDataProvider = ({
 }: {
   children: React.ReactNode
 }) => {
-  const [formData, setFormData] = useState<Record<FormId, any>>({
-    "cardiac-risk-form": {},
-    "diabetes-risk-form": {},
-  })
+  const [formData, setFormData] = useState<Record<FormId, Record<string, any>>>(
+    {
+      "cardiac-risk-form": initializeData(forms["cardiac-risk-form"].fields),
+      "diabetes-risk-form": initializeData(forms["diabetes-risk-form"].fields),
+    }
+  )
 
   const addFormData = (data: RiskFormData) => {
     setFormData((formData) => ({ ...formData, ...data }))

@@ -154,10 +154,10 @@ const Permissions = ({}) => {
               params: { phone: phoneNumber },
             })
           }}
-          //   disabled={
-          //     phoneVerficationProgress !== "verified" ||
-          //     consentProgress !== "signed"
-          //   }
+            disabled={
+              phoneVerficationProgress !== "verified" ||
+              consentProgress !== "signed"
+            }
           sx={{ width: 200 }}
         />
       </View>

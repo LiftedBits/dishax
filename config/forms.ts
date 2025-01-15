@@ -1,9 +1,11 @@
+import { FormId } from "./types"
+
 type NumberField = {
   name: string
   type: "number"
   label: string
   required: boolean
-  validation?: any
+  validation: { min: number; max: number }
 }
 
 export type Option = {
@@ -33,7 +35,7 @@ export type Form = {
   fields: Field[]
 }
 
-export const forms: Record<string, Form> = {
+export const forms: Record<FormId, Form> = {
   "cardiac-risk-form": {
     name: "Cardiac Risk",
     fields: [
@@ -189,12 +191,17 @@ export const forms: Record<string, Form> = {
         type: "number",
         label: "Cholesterol by HDL Ratio",
         required: false,
+        validation: {
+          min: 0,
+          max: 10,
+        },
       },
       {
         name: "optional_systolic_bp_mmHg",
         type: "number",
         label: "Systolic BP (mmHg)",
         required: false,
+        validation: { min: 0, max: 300 },
       },
     ],
   },
