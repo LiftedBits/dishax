@@ -28,16 +28,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmationResult, setConfirmationResult] = useState<any>(null)
-  const [message, setMessage] = useState<string>("Welcome to DishaX. Please login to continue")
+  const [message, setMessage] = useState<string>(
+    "Welcome to DishaX. Please login to continue"
+  )
   const [state, setState] = useState<"none" | "error">("none")
+
+  const printAuthToken = async () => {
+    const token = await user?.getIdToken()
+    console.log("token: ", token)
+  }
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((authUser) => {
       setUser(authUser)
-      setLoading(false) // Finished loading once we have the initial auth state
+      setLoading(false)
     })
+    printAuthToken()
 
-    // Cleanup the subscription on unmount
     return unsubscribe
   }, [])
 
@@ -118,6 +125,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false)
     }
   }
+
+  printAuthToken()
 
   return (
     <AuthContext.Provider

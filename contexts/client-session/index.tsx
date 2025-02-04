@@ -1,3 +1,4 @@
+import { isEmptyString } from "@/lib/utils"
 import { createContext, useContext, useEffect, useState } from "react"
 
 interface UserSessionContextProps {
@@ -5,6 +6,8 @@ interface UserSessionContextProps {
   remainingTime: number
   startSession: (token: string) => void
   endSession: () => void
+  setSignatureBase64: (signatureBase64: string) => void
+  isSignatureCaptured: () => boolean
 }
 
 const UserSessionContext = createContext<UserSessionContextProps | undefined>(
@@ -22,6 +25,7 @@ export const UserSessionProvider = ({
     TOKEN_VALIDITY_DURATION
   )
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null)
+  const [signatureBase64, setSignatureBase64] = useState("")
 
   useEffect(() => {
     console.log("use effect triggered")
@@ -31,6 +35,7 @@ export const UserSessionProvider = ({
       }, 1000)
       return () => clearInterval(interval)
     }
+    console.log("token: ", token)
   }, [token])
 
   const startSession = (_token: string) => {
@@ -53,10 +58,21 @@ export const UserSessionProvider = ({
     }
   }
 
+  const isSignatureCaptured = () => {
+    return !isEmptyString(signatureBase64)
+  }
+
   useEffect(() => {})
   return (
     <UserSessionContext.Provider
-      value={{ token, remainingTime, startSession, endSession }}
+      value={{
+        token,
+        remainingTime,
+        startSession,
+        endSession,
+        setSignatureBase64,
+        isSignatureCaptured,
+      }}
     >
       {children}
     </UserSessionContext.Provider>

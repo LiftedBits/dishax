@@ -1,20 +1,14 @@
 import { PrimaryButton } from "@/components/button"
 import React, { useRef } from "react"
-import { View, Button, Alert, Text } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { View, Alert } from "react-native"
 import Signature, { SignatureViewRef } from "react-native-signature-canvas"
 
 interface SignatureBoxProps {
-  onSave: () => void
+  onSave: (signature: string) => void
 }
 
 const SignatureBox = ({ onSave }: SignatureBoxProps) => {
   const ref = useRef<SignatureViewRef | null>(null)
-
-  const handleSignature = (signature: string) => {
-    Alert.alert("Signature Captured!", "Check the console for Base64 data.")
-    console.log(signature)
-  }
 
   const handleClear = () => {
     ref.current?.clearSignature()
@@ -29,7 +23,7 @@ const SignatureBox = ({ onSave }: SignatureBoxProps) => {
     <>
       <Signature
         ref={ref}
-        // onOK={onSave}
+        onOK={(signature) => onSave(signature)}
         onEmpty={() =>
           Alert.alert("Empty Signature!", "Please draw something.")
         }
@@ -51,7 +45,11 @@ const SignatureBox = ({ onSave }: SignatureBoxProps) => {
           onPress={handleClear}
           sx={{ flex: 1 }}
         />
-        <PrimaryButton buttonText="Save" onPress={onSave} sx={{ flex: 1 }} />
+        <PrimaryButton
+          buttonText="Save"
+          onPress={handleConfirm}
+          sx={{ flex: 1 }}
+        />
       </View>
     </>
   )

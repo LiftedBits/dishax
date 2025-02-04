@@ -23,7 +23,8 @@ const Permissions = ({}) => {
   const COUNTDOWN = 30
 
   const router = useRouter()
-  const { startSession } = useUserSession()
+  const { startSession, setSignatureBase64, isSignatureCaptured } =
+    useUserSession()
   type Operation = "phone_verification" | "consent"
   const [status, setStatus] = useState<"checked" | "unchecked">("checked")
   const [consentProgress, setConsentProgress] = useState<
@@ -75,6 +76,7 @@ const Permissions = ({}) => {
     setIsLoading(true)
     const response = await validateOtp(otpId, otp)
     setIsLoading(false)
+    console.log("response keys: ", Object.keys(response as object))
     console.log("validation: ", response?.success)
     console.log("token: ", response?.token)
     if (response?.success) {
@@ -154,10 +156,11 @@ const Permissions = ({}) => {
               params: { phone: phoneNumber },
             })
           }}
-            disabled={
-              phoneVerficationProgress !== "verified" ||
-              consentProgress !== "signed"
-            }
+          // disabled={
+          //   phoneVerficationProgress !== "verified" ||
+          //   consentProgress !== "signed" ||
+          //   !isSignatureCaptured()
+          // }
           sx={{ width: 200 }}
         />
       </View>
@@ -303,8 +306,11 @@ const Permissions = ({}) => {
             </>
           ) : (
             <SignatureBox
-              onSave={() => {
+              onSave={(signature: string) => {
+                console.log(signature)
+                setSignatureBase64(signature)
                 setConsentProgress("signed")
+                handleClose("consent")
                 console.log("signed in")
               }}
             />

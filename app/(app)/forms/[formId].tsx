@@ -9,6 +9,7 @@ import {
   areObjectsEqual,
   initializeData,
   isInitialData,
+  validateFormData,
 } from "@/lib/utils"
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router"
 import { useCallback, useEffect, useState } from "react"
@@ -25,8 +26,6 @@ export default function FormDetailsPage() {
     setData((prevData) => ({ ...prevData, [name]: value }))
   }
   const { formData, addFormData, resetFormData } = useFormData()
-
-  console.log(Object.keys(formData))
 
   const handleClear = () => {
     Alert.alert(
@@ -46,8 +45,15 @@ export default function FormDetailsPage() {
   }
 
   const handleSave = () => {
-    const keys = form.fields.map((field) => field.name)
-    if (!areAllValuesPresent(data, keys)) {
+    const keys = form.fields
+      .filter((field) => field.required)
+      .map((field) => field.name)
+    if (!validateFormData(forms[formId], data)) {
+      console.log("invalid data")
+      Alert.alert(
+        "Missing field(s)",
+        "One of more fields are missing/inappropriate"
+      )
       return
     }
     addFormData({ [formId]: data } as RiskFormData)

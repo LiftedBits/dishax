@@ -30,3 +30,18 @@ export const validateOtp = async (otpId: string, otp: string) => {
     console.error("Error: ", error)
   }
 }
+
+export const submitFormData = async (
+  token: string,
+  formData: Record<string, any>
+) => {
+  try {
+    const response = await functions.httpsCallable("api-submitFormData")({
+      token,
+      formData,
+    })
+    return response
+  } catch (error) {
+    console.error("Error: ", error)
+  }
+}

@@ -5,6 +5,8 @@ import { forms } from "@/config/forms"
 import { FormId } from "@/config/types"
 import { useUserSession } from "@/contexts/client-session"
 import { useFormData } from "@/contexts/form-data"
+import { submitFormData } from "@/lib/apis"
+import { adaptFormData } from "@/lib/apis/adpters"
 import { getTimeStr, validateFormData } from "@/lib/utils"
 import { useFocusEffect } from "@react-navigation/native"
 import { router, useLocalSearchParams } from "expo-router"
@@ -14,10 +16,11 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function FormsPage() {
   const { phone } = useLocalSearchParams()
-  const { remainingTime, startSession } = useUserSession()
+  const { token, remainingTime } = useUserSession()
   const { formData } = useFormData()
 
   const [areFormsComplete, setAreFormsComplete] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const formIds: FormId[] = Object.keys(forms) as FormId[]
   const formList = Object.fromEntries(
@@ -89,9 +92,6 @@ export default function FormsPage() {
             marginTop: 16,
             fontWeight: "600",
           }}
-          onPress={() => {
-            startSession("abc")
-          }}
         >
           Welcome to your "client name" page, please use the below forms to
           collect data!
@@ -110,7 +110,20 @@ export default function FormsPage() {
         </Text>
         <PrimaryButton
           buttonText="SUBMIT"
-          onPress={() => {}}
+          onPress={async () => {
+            try {
+              setIsSubmitting(true)
+              await submitFormData(
+                token as string,
+                adaptFormData(formData, forms)
+              )
+              setIsSubmitting(false)
+              router.replace("/post-screening")
+            } catch (error) {
+              console.error(error)
+            }
+          }}
+          loading={isSubmitting}
           disabled={!areFormsComplete}
           sx={{ width: 200 }}
         />
