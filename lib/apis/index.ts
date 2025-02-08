@@ -33,12 +33,14 @@ export const validateOtp = async (otpId: string, otp: string) => {
 
 export const submitFormData = async (
   token: string,
-  formData: Record<string, any>
+  formData: Record<string, any>,
+  signatureBase64: string
 ) => {
   try {
     const response = await functions.httpsCallable("api-submitFormData")({
       token,
       formData,
+      signature: signatureBase64
     })
     return response
   } catch (error) {

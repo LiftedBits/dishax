@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function FormsPage() {
   const { phone } = useLocalSearchParams()
-  const { token, remainingTime } = useUserSession()
+  const { token, remainingTime, signatureBase64 } = useUserSession()
   const { formData } = useFormData()
 
   const [areFormsComplete, setAreFormsComplete] = useState(false)
@@ -115,7 +115,8 @@ export default function FormsPage() {
               setIsSubmitting(true)
               await submitFormData(
                 token as string,
-                adaptFormData(formData, forms)
+                adaptFormData(formData, forms),
+                signatureBase64
               )
               setIsSubmitting(false)
               router.replace("/post-screening")

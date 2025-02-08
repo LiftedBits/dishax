@@ -8,9 +8,8 @@ import AntDesign from "@expo/vector-icons/AntDesign"
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { workerLoginButton, workerLoginCard } from "@/config/colors"
-import { Checkbox, TextInput } from "react-native-paper"
+import { Checkbox, RadioButton, TextInput } from "react-native-paper"
 import { MenuButton, PrimaryButton } from "@/components/button"
-import PhoneInput from "react-native-phone-number-input"
 import { Keyboard } from "react-native"
 import { OtpInput } from "react-native-otp-entry"
 import { useRouter } from "expo-router"
@@ -23,8 +22,11 @@ const Permissions = ({}) => {
   const COUNTDOWN = 30
 
   const router = useRouter()
-  const { startSession, setSignatureBase64, isSignatureCaptured } =
-    useUserSession()
+  const {
+    startSession,
+    setSignatureBase64,
+    isSignatureCaptured,
+  } = useUserSession()
   type Operation = "phone_verification" | "consent"
   const [status, setStatus] = useState<"checked" | "unchecked">("checked")
   const [consentProgress, setConsentProgress] = useState<
@@ -39,7 +41,6 @@ const Permissions = ({}) => {
   const [resendCountdown, setResendCountdown] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
   const phoneVerficationRef = useRef<BottomSheet>(null)
   const consentSheetRef = useRef<BottomSheet>(null)
   const refs = {
@@ -156,11 +157,11 @@ const Permissions = ({}) => {
               params: { phone: phoneNumber },
             })
           }}
-          // disabled={
-          //   phoneVerficationProgress !== "verified" ||
-          //   consentProgress !== "signed" ||
-          //   !isSignatureCaptured()
-          // }
+          disabled={
+            phoneVerficationProgress !== "verified" ||
+            consentProgress !== "signed" ||
+            !isSignatureCaptured()
+          }
           sx={{ width: 200 }}
         />
       </View>
@@ -307,11 +308,9 @@ const Permissions = ({}) => {
           ) : (
             <SignatureBox
               onSave={(signature: string) => {
-                console.log(signature)
                 setSignatureBase64(signature)
                 setConsentProgress("signed")
                 handleClose("consent")
-                console.log("signed in")
               }}
             />
           )}
@@ -378,6 +377,7 @@ const Permissions = ({}) => {
                 <Text style={{ color: "#fff", fontSize: 16 }}>Phone no.</Text>
               </View>
               <TextInput
+                keyboardType="number-pad"
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 placeholder="+91 _ _ _ _ _ _ _ _ _ _"

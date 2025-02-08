@@ -1,4 +1,6 @@
 export type FormId =
+  | "demographic-data-form"
+  | "vitals-form"
   | "cardiac-risk-form"
   | "diabetes-risk-form"
   | "gad-7"
@@ -13,6 +15,26 @@ type MentalStateOptions =
   | "several_days"
   | "more_than_half_the_days"
   | "nearly_every_day"
+
+export type DemographicData = {
+  name: string
+  age: string
+  gender: "male" | "female"
+  state: string
+  district: string
+  region: string
+}
+
+export type Vitals = {
+  systolic_bp_mmHg: number
+  diastolic_bp_mmHg: number
+  pulse_rate_bpm: number
+  weight_kg: number
+  height_cm: number
+  temperature_celsius: number
+  oxygen_saturation: number
+  respiratory_rate: number
+}
 
 export type CardiacRiskData = {
   age: number

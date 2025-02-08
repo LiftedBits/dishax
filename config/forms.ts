@@ -1,3 +1,4 @@
+import { getDistrictOptions, State, stateOptions } from "./region"
 import { FormId } from "./types"
 
 type NumberField = {
@@ -14,12 +15,13 @@ export type Option = {
   score?: number
 }
 
-type SelectField = {
+type RadioOptions = {
   name: string
   type: "select"
   label: string
   required: boolean
   options: Option[]
+  rowWrap?: boolean
 }
 
 type CheckBoxField = {
@@ -29,7 +31,37 @@ type CheckBoxField = {
   required: boolean
 }
 
-export type Field = NumberField | SelectField | CheckBoxField
+type TextField = {
+  name: string
+  type: "text"
+  label: string
+  required: boolean
+}
+
+type DropDownField = {
+  name: string
+  type: "dropdown"
+  label: string
+  required: boolean
+  options: Option[]
+}
+
+type ConditionalSelectField = {
+  name: string
+  type: "conditional-select"
+  label: string
+  required: boolean
+  parentField: string
+  options: (parentValue: any) => Option[]
+}
+
+export type Field =
+  | NumberField
+  | RadioOptions
+  | DropDownField
+  | ConditionalSelectField
+  | CheckBoxField
+  | TextField
 
 export type Form = {
   name: string
@@ -62,6 +94,140 @@ const phq15options = [
 ]
 
 export const forms: Record<FormId, Form> = {
+  "demographic-data-form": {
+    name: "Demographic Data",
+    fields: [
+      {
+        name: "name",
+        type: "text",
+        label: "Name",
+        required: true,
+      },
+      {
+        name: "age",
+        type: "number",
+        label: "Age",
+        required: true,
+        validation: {
+          min: 0,
+          max: 120,
+        },
+      },
+      {
+        name: "gender",
+        type: "select",
+        label: "Gender",
+        required: true,
+        options: [
+          { label: "Female", value: "female" },
+          { label: "Male", value: "male" },
+        ],
+        rowWrap: true,
+      },
+      {
+        name: "state",
+        type: "dropdown",
+        label: "State",
+        required: true,
+        options: stateOptions,
+      },
+      {
+        name: "district",
+        type: "conditional-select",
+        label: "District",
+        required: true,
+        parentField: "state",
+        options: (state: string) => {
+          return state === "" ? [] : getDistrictOptions(state as State)
+        },
+      },
+    ],
+  },
+  "vitals-form": {
+    name: "Vitals",
+    fields: [
+      {
+        name: "systolic_bp_mmHg",
+        type: "number",
+        label: "Systolic BP (mmHg)",
+        required: true,
+        validation: {
+          min: 0,
+          max: 300,
+        },
+      },
+      {
+        name: "diastolic_bp_mmHg",
+        type: "number",
+        label: "Diastolic BP (mmHg)",
+        required: true,
+        validation: {
+          min: 0,
+          max: 200,
+        },
+      },
+      {
+        name: "pulse_rate_bpm",
+        type: "number",
+        label: "Pulse Rate (bpm)",
+        required: true,
+        validation: {
+          min: 0,
+          max: 200,
+        },
+      },
+      {
+        name: "weight_kg",
+        type: "number",
+        label: "Weight (kg)",
+        required: true,
+        validation: {
+          min: 3,
+          max: 300,
+        },
+      },
+      {
+        name: "height_cm",
+        type: "number",
+        label: "Height (cm)",
+        required: true,
+        validation: {
+          min: 50,
+          max: 250,
+        },
+      },
+      {
+        name: "temperature_celsius",
+        type: "number",
+        label: "Temperature (°C)",
+        required: true,
+        validation: {
+          min: 35,
+          max: 42,
+        },
+      },
+      {
+        name: "oxygen_saturation",
+        type: "number",
+        label: "Oxygen Saturation (%)",
+        required: true,
+        validation: {
+          min: 0,
+          max: 100,
+        },
+      },
+      {
+        name: "respiratory_rate",
+        type: "number",
+        label: "Respiratory Rate",
+        required: true,
+        validation: {
+          min: 0,
+          max: 100,
+        },
+      },
+    ],
+  },
   "cardiac-risk-form": {
     name: "Cardiac Risk",
     fields: [

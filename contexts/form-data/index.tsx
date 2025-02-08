@@ -23,10 +23,15 @@ export const FormDataProvider = ({
   children: React.ReactNode
 }) => {
   const [formData, setFormData] = useState<Record<FormId, Record<string, any>>>(
-    {
-      "cardiac-risk-form": initializeData(forms["cardiac-risk-form"].fields),
-      "diabetes-risk-form": initializeData(forms["diabetes-risk-form"].fields),
+    // {
+    //   "cardiac-risk-form": initializeData(forms["cardiac-risk-form"].fields),
+    //   "diabetes-risk-form": initializeData(forms["diabetes-risk-form"].fields),
+    // }
+    Object.values(forms).reduce((acc, form) => {
+      acc[form.name as FormId] = initializeData(form.fields)
+      return acc
     }
+    , {} as Record<FormId, Record<string, any>>)
   )
 
   const addFormData = (data: RiskFormData) => {

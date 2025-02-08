@@ -1,8 +1,7 @@
-import { Text, TextInput, View } from "react-native"
+import { StyleProp, Text, TextInput, TextStyle, View } from "react-native"
 import { Checkbox, RadioButton } from "react-native-paper"
 import { Dropdown } from "react-native-element-dropdown"
 import { useState } from "react"
-import AntDesign from "@expo/vector-icons/AntDesign"
 import { Option } from "@/config/forms"
 import { workerLoginCard } from "@/config/colors"
 
@@ -10,9 +9,17 @@ interface NumberInputProps {
   value: string
   setValue: (data: string) => void
   label: string
+  labelStyle?: StyleProp<TextStyle>
+  inputStyle?: StyleProp<TextStyle>
 }
 
-export const NumberInput = ({ value, setValue, label }: NumberInputProps) => {
+export const NumberInput = ({
+  value,
+  setValue,
+  label,
+  labelStyle,
+  inputStyle,
+}: NumberInputProps) => {
   return (
     <View
       style={{
@@ -22,7 +29,9 @@ export const NumberInput = ({ value, setValue, label }: NumberInputProps) => {
         paddingHorizontal: 8,
       }}
     >
-      <Text style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>
+      <Text
+        style={[{ fontWeight: 600, fontSize: 18, marginBottom: 8 }, labelStyle]}
+      >
         {label}
       </Text>
       <TextInput
@@ -31,13 +40,57 @@ export const NumberInput = ({ value, setValue, label }: NumberInputProps) => {
         onChangeText={(value) => {
           setValue(value)
         }}
+        style={[
+          {
+            borderWidth: 1,
+            width: 100,
+            height: 36,
+            borderRadius: 8,
+            padding: 8,
+            textAlign: "center",
+          },
+          inputStyle,
+        ]}
+      />
+    </View>
+  )
+}
+
+export const TextInputBlock = ({
+  value,
+  setValue,
+  label,
+}: NumberInputProps) => {
+  return (
+    <View
+      style={{
+        // flexDirection: "row",
+        // alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 8,
+      }}
+    >
+      <Text
+        style={{
+          fontWeight: 600,
+          fontSize: 16,
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </Text>
+      <TextInput
+        value={value}
+        onChangeText={(value) => {
+          setValue(value)
+        }}
         style={{
           borderWidth: 1,
-          width: 100,
-          height: 36,
+          height: 45,
           borderRadius: 8,
           padding: 8,
-          textAlign: "center",
+          paddingHorizontal: 12,
+          backgroundColor: "white",
         }}
       />
     </View>
@@ -75,12 +128,14 @@ export const CheckboxInput = ({
 
 interface DropDownInputProps {
   data: Option[]
+  label: string
   value: string | null
   setValue: (value: string) => void
 }
 
 export const DropDownInput = ({
   data,
+  label,
   value,
   setValue,
 }: DropDownInputProps) => {
@@ -88,18 +143,28 @@ export const DropDownInput = ({
   return (
     <View
       style={{
-        backgroundColor: "white",
-        padding: 16,
+        paddingHorizontal: 8,
       }}
     >
+      <Text
+        style={{
+          fontWeight: 600,
+          fontSize: 16,
+          marginBottom: 5,
+        }}
+      >
+        {label}
+      </Text>
       <Dropdown
+        disable={data.length === 0}
         style={[
           {
-            height: 50,
+            height: 45,
             borderColor: "gray",
             borderWidth: 0.5,
             borderRadius: 8,
             paddingHorizontal: 8,
+            backgroundColor: "white",
           },
           isFocus && { borderColor: "blue" },
         ]}
@@ -125,16 +190,6 @@ export const DropDownInput = ({
           setValue(item.value)
           setIsFocus(false)
         }}
-        renderLeftIcon={() => (
-          <AntDesign
-            style={{
-              marginRight: 5,
-            }}
-            color={isFocus ? "blue" : "black"}
-            name="Safety"
-            size={20}
-          />
-        )}
       />
     </View>
   )
@@ -144,12 +199,14 @@ interface RadioButtonInputProps {
   label: string
   data: Option[]
   setValue: (value: string) => void
+  rowWrap?: boolean
 }
 
 export const RadioButtonInput = ({
   label,
   data,
   setValue,
+  rowWrap,
 }: RadioButtonInputProps) => {
   const [_value, _setValue] = useState(data[0].value)
   return (
@@ -171,7 +228,7 @@ export const RadioButtonInput = ({
         }}
         value={_value}
       >
-        <View style={{ rowGap: 4 }}>
+        <View style={{ rowGap: 4, flexDirection: rowWrap ? "row" : "column" }}>
           {data.map((option) => {
             return (
               <View

@@ -6,6 +6,7 @@ interface UserSessionContextProps {
   remainingTime: number
   startSession: (token: string) => void
   endSession: () => void
+  signatureBase64: string
   setSignatureBase64: (signatureBase64: string) => void
   isSignatureCaptured: () => boolean
 }
@@ -70,6 +71,7 @@ export const UserSessionProvider = ({
         remainingTime,
         startSession,
         endSession,
+        signatureBase64,
         setSignatureBase64,
         isSignatureCaptured,
       }}

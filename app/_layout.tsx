@@ -4,6 +4,7 @@ import { Slot } from "expo-router"
 import { SafeAreaView } from "react-native"
 
 export default function RootLayout() {
+  console.log("Expo key: ", process.env.EXPO_PUBLIC_API_KEY)
   return (
     <AuthProvider>
       <UserSessionProvider>

@@ -1,5 +1,11 @@
 import { PrimaryButton } from "@/components/button"
-import { CheckboxInput, NumberInput, RadioButtonInput } from "@/components/form"
+import {
+  CheckboxInput,
+  DropDownInput,
+  NumberInput,
+  RadioButtonInput,
+  TextInputBlock,
+} from "@/components/form"
 import { formBackground, formHeading } from "@/config/colors"
 import { forms } from "@/config/forms"
 import { FormId } from "@/config/types"
@@ -140,15 +146,42 @@ export default function FormDetailsPage() {
                   }}
                   text={`${field.required ? "* " : ""}${field.label}`}
                 />
-              ) : (
+              ) : field.type === "select" ? (
                 <RadioButtonInput
                   label={`${field.label}${field.required ? " *" : ""}`}
                   data={field.options}
                   setValue={(value) => {
                     handleChange(field.name, value)
                   }}
+                  rowWrap={field.rowWrap}
                 />
-              )}
+              ) : field.type === "text" ? (
+                <TextInputBlock
+                  value={data[field.name]}
+                  setValue={(value) => {
+                    handleChange(field.name, value)
+                  }}
+                  label={`${field.label}${field.required ? " *" : ""}`}
+                />
+              ) : field.type === "dropdown" ? (
+                <DropDownInput
+                  data={field.options}
+                  label={`${field.label}${field.required ? " *" : ""}`}
+                  value={data[field.name]}
+                  setValue={(value) => {
+                    handleChange(field.name, value)
+                  }}
+                />
+              ) : field.type === "conditional-select" ? (
+                <DropDownInput
+                  data={field.options(data["state"])}
+                  label={`${field.label}${field.required ? " *" : ""}`}
+                  value={data[field.name]}
+                  setValue={(value) => {
+                    handleChange(field.name, value)
+                  }}
+                />
+              ) : null}
             </View>
           )
         })}
